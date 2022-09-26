@@ -1,10 +1,18 @@
 const Student = require("../model/Student");
+const winston = require('winston');
+
+const consoleTransport = new winston.transports.Console()
 /**
  * Posee toda la lógica de negocio
  * necesaria para realizar el CRUD
  * de estudiantes
  */
+ const myWinstonOptions = {
+  transports: [consoleTransport]
+}
+const logger = new winston.createLogger(myWinstonOptions)
 module.exports = class StudentService {
+  
   /**
    * Método usado para actualizar un estudiante
    * a través de su identificación y devolver un json
@@ -47,7 +55,7 @@ module.exports = class StudentService {
    */
   static async update(req, res) {
     const { firstname, lastname, subjects } = req.body;
-    const identification = req.params.id;
+    const identification = req.params.identification;
     try {
       await Student.updateOne(
         { identification : `${identification}` },
@@ -75,7 +83,7 @@ module.exports = class StudentService {
    * @param {*HttpResponse} res 
    */
   static async delete(req, res) {
-    const identification = req.params.id;
+    const identification = req.params.identification;
     try {
       const deleted = await Student.deleteOne(
         { identification : `${identification}` },
@@ -103,8 +111,11 @@ module.exports = class StudentService {
    */
   static async findAll(req, res) {
     try {
-      const data = await Student.find({}).select("-_id").select("-__v");
-      res.json({ data: data });
+      logger.info("buscando")
+      const student = await Student.find({}).select("-_id").select("-__v"); 
+      res.setHeader("content-type", "application/json");
+      res.json({ student: student });
+      logger.info(student);
       res.status(200);
     } catch (error) {
       res.status(400);
@@ -121,7 +132,7 @@ module.exports = class StudentService {
    * @param {*HttpResponse} res 
    */
   static async findOne(req, res) {
-    const identification = req.params.id;
+    const identification = req.params.identification;
     try {
       const student = await Student.find({ identification }).select("-_id").select("-__v");
       res.json({ data: student });

@@ -1,8 +1,18 @@
 const studentService = require("../service/StudentService");
+const winston = require('winston');
+
+const consoleTransport = new winston.transports.Console()
 /**
  * Posee las llamadas a los servicios correspondientes
  * para cada operación del CRUD
+ * 
  */
+ const myWinstonOptions = {
+  transports: [consoleTransport]
+}
+const logger = new winston.createLogger(myWinstonOptions)
+
+
 module.exports = class StudentController {
 
   /**
@@ -12,7 +22,8 @@ module.exports = class StudentController {
    * @param {*HttpResponse} res 
    */
   static async save(req, res) {
-    try {
+    try {  
+      logger.info(req.body.firstname);
       await studentService.save(req, res);
       res.send();
     } catch (error) {
