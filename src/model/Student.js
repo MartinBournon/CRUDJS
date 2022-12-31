@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const studentSchema = new Schema({
     identification:{
-        type: Number,
+        type: String,
         required: true 
     },
     firstname:{
